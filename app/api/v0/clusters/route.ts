@@ -1,6 +1,12 @@
+import { ZodError } from "zod"
+
 import { db } from "@/db"
-import { clusterConfigurations, clusters } from "@/db/schema"
-import { tmp_renameClusterConfiguration } from "@/lib/clusters"
+import {
+  clusterMachines,
+  clusters,
+  clusterVersions,
+  machines,
+} from "@/db/schema"
 import { withAuth } from "@/lib/middleware/with-auth"
 import { createClusterSchema } from "@/lib/zod/schemas/cluster"
 
@@ -11,28 +17,34 @@ export const GET = withAuth(async ({ user }) => {
         index: true,
         nickname: true,
         description: true,
-        hardware: true,
         cycle_type: true,
         proof_type: true,
       },
       where: (cluster, { eq }) => eq(cluster.team_id, user.id),
       with: {
-        cc: {
+        versions: {
           columns: {
-            instance_type_id: true,
-            instance_count: true,
+            id: true,
           },
           with: {
-            aip: true,
+            cluster_machines: {
+              columns: {
+                id: true,
+                machine_count: true,
+                cloud_instance_count: true,
+              },
+              with: {
+                cloud_instance: true,
+                machine: true,
+              },
+            },
           },
         },
       },
     })
 
-    const renamedClusters = clusters.map(tmp_renameClusterConfiguration)
-
     return Response.json(
-      renamedClusters.map(({ index, ...cluster }) => ({
+      clusters.map(({ index, ...cluster }) => ({
         id: index,
         ...cluster,
       }))
@@ -52,6 +64,13 @@ export const POST = withAuth(async ({ request, user }) => {
     clusterPayload = createClusterSchema.parse(requestBody)
   } catch (error) {
     console.error("cluster payload invalid", error)
+
+    if (error instanceof ZodError) {
+      return new Response(error.message, {
+        status: 400,
+      })
+    }
+
     return new Response("Invalid payload", {
       status: 400,
     })
@@ -60,26 +79,27 @@ export const POST = withAuth(async ({ request, user }) => {
   const {
     nickname,
     description,
+    zkvm_version_id,
     hardware,
     configuration,
     cycle_type,
     proof_type,
   } = clusterPayload
 
-  // get & validate instance type ids
-  const instanceTypeIds = await db.query.awsInstancePricing.findMany({
+  // get & validate cloud instance ids
+  const cloudInstanceIds = await db.query.cloudInstances.findMany({
     columns: {
       id: true,
-      instance_type: true,
+      instance_name: true,
     },
-    where: (awsInstancePricing, { inArray }) =>
+    where: (cloudInstances, { inArray }) =>
       inArray(
-        awsInstancePricing.instance_type,
-        configuration.map((config) => config.instance_type)
+        cloudInstances.instance_name,
+        configuration.map((config) => config.cloud_instance_name)
       ),
   })
 
-  if (instanceTypeIds.length !== configuration.length) {
+  if (cloudInstanceIds.length !== configuration.length) {
     return new Response("Invalid cluster configuration", { status: 400 })
   }
 
@@ -98,21 +118,46 @@ export const POST = withAuth(async ({ request, user }) => {
       })
       .returning({ id: clusters.id, index: clusters.index })
 
-    // create cluster configuration
-    const instanceTypeById = instanceTypeIds.reduce(
-      (acc, instanceType) => {
-        acc[instanceType.instance_type] = instanceType.id
+    // create cluster version
+    const [clusterVersion] = await tx
+      .insert(clusterVersions)
+      .values({
+        cluster_id: cluster.id,
+        zkvm_version_id,
+        // TODO: remove this once we have a real version management system for users
+        version: "v0.1",
+      })
+      .returning({ id: clusterVersions.id })
+
+    // create machines
+    const createdMachines = await tx
+      .insert(machines)
+      .values(configuration.map(({ machine }) => machine))
+      .returning({ id: machines.id })
+
+    // map cloud instance names to ids
+    const cloudInstanceByName = cloudInstanceIds.reduce(
+      (acc, cloudInstance) => {
+        acc[cloudInstance.instance_name] = cloudInstance.id
         return acc
       },
       {} as Record<string, number>
     )
 
-    await tx.insert(clusterConfigurations).values(
-      configuration.map(({ instance_type, instance_count }) => ({
-        cluster_id: cluster.id,
-        instance_type_id: instanceTypeById[instance_type],
-        instance_count,
-      }))
+    // create cluster configurations
+    await tx.insert(clusterMachines).values(
+      configuration.map(
+        (
+          { cloud_instance_name, cloud_instance_count, machine_count },
+          index
+        ) => ({
+          cluster_version_id: clusterVersion.id,
+          machine_id: createdMachines[index].id,
+          machine_count,
+          cloud_instance_id: cloudInstanceByName[cloud_instance_name],
+          cloud_instance_count,
+        })
+      )
     )
 
     clusterIndex = cluster.index

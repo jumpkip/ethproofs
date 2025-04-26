@@ -17,7 +17,6 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:seed": "tsx supabase/seed/seed.ts > supabase/seed.sql",
-    "db:types": "supabase gen types typescript --local > lib/database.types.ts",
     "seed:sync": "snaplet-seed sync --config supabase/seed/seed.config.ts",
     "seed:generate": "snaplet-seed generate --config supabase/seed/seed.config.ts",
     "api:docs": "tsx scripts/generate-openapi.ts & npx @redocly/cli build-docs public/openapi.json --output=public/api.html"
@@ -41,7 +40,7 @@
     "drizzle-orm": "^0.38.2",
     "geist": "^1.2.1",
     "lucide-react": "^0.416.0",
-    "next": "^14",
+    "next": "^14.2.26",
     "next-sitemap": "^4.2.3",
     "next-themes": "^0.3.0",
     "postgres": "^3.4.5",

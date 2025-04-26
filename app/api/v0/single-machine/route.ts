@@ -1,7 +1,12 @@
 import { ZodError } from "zod"
 
 import { db } from "@/db"
-import { clusterConfigurations, clusters } from "@/db/schema"
+import {
+  clusterMachines,
+  clusters,
+  clusterVersions,
+  machines,
+} from "@/db/schema"
 import { withAuth } from "@/lib/middleware/with-auth"
 import { singleMachineSchema } from "@/lib/zod/schemas/cluster"
 
@@ -28,24 +33,26 @@ export const POST = withAuth(async ({ request, user }) => {
   const {
     nickname,
     description,
+    zkvm_version_id,
     hardware,
     cycle_type,
     proof_type,
-    instance_type,
+    cloud_instance_name,
+    machine,
   } = singleMachinePayload
 
-  // get & validate instance type id
-  const instanceType = await db.query.awsInstancePricing.findFirst({
+  // get & validate cloud instance id
+  const cloudInstance = await db.query.cloudInstances.findFirst({
     columns: {
       id: true,
-      instance_type: true,
+      instance_name: true,
     },
-    where: (awsInstancePricing, { eq }) =>
-      eq(awsInstancePricing.instance_type, instance_type),
+    where: (cloudInstances, { eq }) =>
+      eq(cloudInstances.instance_name, cloud_instance_name),
   })
 
-  if (!instanceType) {
-    return new Response("Instance type not found", { status: 400 })
+  if (!cloudInstance) {
+    return new Response("Cloud instance not found", { status: 400 })
   }
 
   let clusterIndex: number | null = null
@@ -63,11 +70,30 @@ export const POST = withAuth(async ({ request, user }) => {
       })
       .returning({ id: clusters.id, index: clusters.index })
 
+    // create cluster version
+    const [clusterVersion] = await tx
+      .insert(clusterVersions)
+      .values({
+        cluster_id: cluster.id,
+        zkvm_version_id,
+        // TODO: remove this once we have a real version management system for users
+        version: "v0.1",
+      })
+      .returning({ id: clusterVersions.id })
+
+    // create machine
+    const [createdMachine] = await tx
+      .insert(machines)
+      .values(machine)
+      .returning({ id: machines.id })
+
     // create single machine as a cluster with 1 instance
-    await tx.insert(clusterConfigurations).values({
-      cluster_id: cluster.id,
-      instance_type_id: instanceType.id,
-      instance_count: 1,
+    await tx.insert(clusterMachines).values({
+      cluster_version_id: clusterVersion.id,
+      machine_id: createdMachine.id,
+      machine_count: 1,
+      cloud_instance_id: cloudInstance.id,
+      cloud_instance_count: 1,
     })
 
     clusterIndex = cluster.index

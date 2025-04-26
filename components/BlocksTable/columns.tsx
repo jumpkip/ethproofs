@@ -3,8 +3,9 @@
 import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
 
-import type { Block, Proof } from "@/lib/types"
+import type { Block, Proof, ProofWithCluster } from "@/lib/types"
 
+import { ColumnHeader } from "@/components/ColumnHeader"
 import { metrics } from "@/components/Metrics"
 import Null from "@/components/Null"
 import ArrowRight from "@/components/svgs/arrow-right.svg"
@@ -22,12 +23,12 @@ import { TooltipContentFooter } from "../ui/tooltip"
 
 import AvgBestMetric from "./AvgBestMetric"
 
-import { ColumnHeader } from "@/app/prover/[teamId]/ColumnHeader"
 import { formatTimeAgo } from "@/lib/date"
 import { formatNumber } from "@/lib/number"
 import {
   getCostPerMgasStats,
   getCostPerProofStats,
+  getProofsPerStatusCount,
   getProvingTimeStats,
   getTotalTTPStats,
 } from "@/lib/proofs"
@@ -133,7 +134,7 @@ export const columns: ColumnDef<Block>[] = [
       </ColumnHeader>
     ),
     cell: ({ cell }) => {
-      const proofs = cell.getValue() as Proof[]
+      const proofs = cell.getValue() as ProofWithCluster[]
 
       const stats = getCostPerProofStats(proofs)
 
@@ -171,7 +172,7 @@ export const columns: ColumnDef<Block>[] = [
       </ColumnHeader>
     ),
     cell: ({ cell }) => {
-      const proofs = cell.getValue() as Proof[]
+      const proofs = cell.getValue() as ProofWithCluster[]
 
       const stats = getProvingTimeStats(proofs)
 
@@ -196,16 +197,17 @@ export const columns: ColumnDef<Block>[] = [
       </ColumnHeader>
     ),
     cell: ({ cell, row }) => {
-      const proofs = cell.getValue() as Proof[]
+      const proofs = cell.getValue() as ProofWithCluster[]
       const timestamp = row.original.timestamp
 
       if (!timestamp) return <Null />
 
       const totalTTPStats = getTotalTTPStats(proofs, timestamp)
+      const proofsPerStatusCount = getProofsPerStatusCount(proofs)
 
       return (
         <div className="flex flex-col justify-center text-center">
-          <ProofStatus className="mx-auto" proofs={proofs} />
+          <ProofStatus className="mx-auto" statusCount={proofsPerStatusCount} />
           <div className="whitespace-nowrap text-sm text-body-secondary">
             {totalTTPStats?.bestFormatted ?? <Null />}
           </div>

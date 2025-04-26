@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server"
 
+import { DEFAULT_PAGE_SIZE } from "@/lib/constants"
+
 import { fetchBlocksPaginated } from "@/lib/api/blocks"
 
 export async function GET(request: NextRequest) {
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest) {
   try {
     const blocks = await fetchBlocksPaginated({
       pageIndex,
-      pageSize,
+      pageSize: Math.min(pageSize, DEFAULT_PAGE_SIZE),
     })
 
     return Response.json(blocks)

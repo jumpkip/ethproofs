@@ -1,0 +1,55 @@
+import { eq, sql } from "drizzle-orm"
+import { count } from "drizzle-orm"
+import { PaginationState } from "@tanstack/react-table"
+
+import { db } from "@/db"
+import { proofs } from "@/db/schema"
+
+export const fetchTeamProofsPaginated = async (
+  teamId: string,
+  pagination: PaginationState
+) => {
+  const proofsRows = await db.query.proofs.findMany({
+    with: {
+      block: true,
+      cluster_version: {
+        with: {
+          cluster: true,
+          cluster_machines: {
+            with: {
+              cloud_instance: true,
+              machine: true,
+            },
+          },
+        },
+      },
+    },
+    where: (proofs, { eq }) => eq(proofs.team_id, teamId),
+    orderBy: (proofs, { desc }) => [desc(proofs.created_at)],
+    limit: pagination.pageSize,
+    offset: pagination.pageIndex * pagination.pageSize,
+  })
+
+  const [rowCount] = await db
+    .select({ count: count() })
+    .from(proofs)
+    .where(eq(proofs.team_id, teamId))
+
+  return {
+    rows: proofsRows,
+    rowCount: rowCount.count,
+  }
+}
+
+export const fetchTeamProofsPerStatusCount = async (teamId: string) => {
+  const proofsPerStatusCount = await db
+    .select({
+      proof_status: proofs.proof_status,
+      count: sql<number>`cast(count(${proofs.proof_id}) as int)`,
+    })
+    .from(proofs)
+    .where(eq(proofs.team_id, teamId))
+    .groupBy(proofs.proof_status)
+
+  return proofsPerStatusCount
+}

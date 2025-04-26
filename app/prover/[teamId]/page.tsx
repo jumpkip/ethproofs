@@ -1,8 +1,13 @@
 import { type Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query"
 
-import type { Cluster, Metric, Proof } from "@/lib/types"
+import type { Metric, Proof } from "@/lib/types"
 
 import Null from "@/components/Null"
 import ProofStatus, { ProofStatusInfo } from "@/components/ProofStatus"
@@ -13,8 +18,8 @@ import ProofCircle from "@/components/svgs/proof-circle.svg"
 import TrendingUp from "@/components/svgs/trending-up.svg"
 import XLogo from "@/components/svgs/x-logo.svg"
 import TeamLogo from "@/components/TeamLogo"
+import TeamProofsTable from "@/components/TeamProofsTable"
 import { Card } from "@/components/ui/card"
-import DataTableUncontrolled from "@/components/ui/data-table-uncontrolled"
 import {
   HeroBody,
   HeroDivider,
@@ -33,12 +38,14 @@ import {
 
 import { cn } from "@/lib/utils"
 
-import { AVERAGE_LABEL, SITE_NAME } from "@/lib/constants"
+import { AVERAGE_LABEL, DEFAULT_PAGE_STATE, SITE_NAME } from "@/lib/constants"
 
-import { columns } from "./columns"
-
-import { db } from "@/db"
-import { tmp_renameClusterConfiguration } from "@/lib/clusters"
+import { getClustersByTeamId } from "@/lib/api/clusters"
+import {
+  fetchTeamProofsPaginated,
+  fetchTeamProofsPerStatusCount,
+} from "@/lib/api/proofs"
+import { getTeam } from "@/lib/api/teams"
 import { getMetadata } from "@/lib/metadata"
 import { formatNumber, formatUsd } from "@/lib/number"
 import {
@@ -58,12 +65,7 @@ export async function generateMetadata({
 }: ProverPageProps): Promise<Metadata> {
   const { teamId } = await params
 
-  const team = await db.query.teams.findFirst({
-    columns: {
-      name: true,
-    },
-    where: (teams, { eq }) => eq(teams.id, teamId),
-  })
+  const team = await getTeam(teamId)
 
   if (!team) return { title: `Prover not found - ${SITE_NAME}` }
 
@@ -73,44 +75,30 @@ export async function generateMetadata({
 export default async function ProverPage({ params }: ProverPageProps) {
   const { teamId } = await params
 
-  const team = await db.query.teams.findFirst({
-    where: (teams, { eq }) => eq(teams.id, teamId),
-  })
+  const team = await getTeam(teamId)
 
   if (!team) return notFound()
 
-  const proofsRaw = await db.query.proofs.findMany({
-    where: (proofs, { eq }) => eq(proofs.team_id, team.id),
-    with: {
-      block: true,
-      cluster: {
-        with: {
-          cc: {
-            with: {
-              aip: true,
-            },
-          },
-        },
-      },
+  const proofsPerStatusCount = await fetchTeamProofsPerStatusCount(teamId)
+  const proofsPerStatusCountMap = proofsPerStatusCount.reduce(
+    (acc, curr) => {
+      acc[curr.proof_status] = curr.count
+      return acc
     },
+    {} as Record<string, number>
+  )
+
+  // prefetch proofs for first page of table
+  const queryClient = new QueryClient()
+  const response = await fetchTeamProofsPaginated(teamId, DEFAULT_PAGE_STATE)
+  await queryClient.prefetchQuery({
+    queryKey: ["proofs", teamId, DEFAULT_PAGE_STATE],
+    queryFn: () => response,
   })
 
-  if (!proofsRaw.length) return notFound()
+  const proofs = response.rows
 
-  const proofs = proofsRaw.map((proof) => ({
-    ...proof,
-    cluster: tmp_renameClusterConfiguration(proof.cluster),
-  }))
-
-  const clusters = Object.values(
-    proofs.reduce((acc, curr) => {
-      if (!curr.cluster || !curr.cluster.index) return acc
-      return {
-        ...acc,
-        [curr.cluster.index]: curr.cluster,
-      }
-    }, {})
-  ) satisfies Cluster[]
+  const clusters = await getClustersByTeamId(teamId)
 
   const completedProofs = proofs.filter(isCompleted)
   const totalZkVMCycles = completedProofs.reduce(
@@ -127,14 +115,14 @@ export default async function ProverPage({ params }: ProverPageProps) {
 
   const avgCostPerMgas = totalProvingCosts / (totalGasProven / 1e6)
 
-  const avgProofProvingTime = getProofsAvgProvingTime(proofs as Proof[])
+  const avgProofProvingTime = getProofsAvgProvingTime(proofs)
 
   const performanceMetrics: Metric[] = [
     {
       key: "total-proofs",
       label: "Total proofs",
       description: <ProofStatusInfo title="total proofs" />,
-      value: <ProofStatus proofs={proofs as Proof[]} />,
+      value: <ProofStatus statusCount={proofsPerStatusCountMap} />,
     },
     {
       key: "avg-zkvm-cycles-per-mgas",
@@ -267,20 +255,16 @@ export default async function ProverPage({ params }: ProverPageProps) {
         <h2 className="flex items-center gap-2 text-lg font-normal text-primary">
           <ProofCircle /> Proofs
         </h2>
-        <DataTableUncontrolled
-          columns={columns}
-          data={proofs as Proof[]}
-          sorting={[{ id: "block_number", desc: true }]}
-        />
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <TeamProofsTable teamId={team.id} />
+        </HydrationBoundary>
       </section>
 
       <section>
         <h2 className="flex items-center gap-2 text-lg font-normal text-primary">
           <Cpu /> Proving instances
         </h2>
-        <div
-          className="mt-8 grid gap-8 md:grid-cols-[repeat(auto-fill,minmax(24rem,1fr))]"
-        >
+        <div className="mt-8 grid gap-8 md:grid-cols-[repeat(auto-fill,minmax(24rem,1fr))]">
           {clusters.map(({ nickname, hardware, description }) => (
             <Card key={nickname} className="space-y-4">
               <h3 className="text-xl font-semibold">{nickname}</h3>

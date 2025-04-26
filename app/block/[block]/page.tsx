@@ -47,12 +47,12 @@ import { AVERAGE_LABEL } from "@/lib/constants"
 import { db } from "@/db"
 import { timestampToEpoch, timestampToSlot } from "@/lib/beaconchain"
 import { getBlockValueType } from "@/lib/blocks"
-import { tmp_renameClusterConfiguration } from "@/lib/clusters"
 import { getMetadata } from "@/lib/metadata"
 import { formatNumber, formatUsd } from "@/lib/number"
 import {
   getCostPerMgasStats,
   getCostPerProofStats,
+  getProofsPerStatusCount,
   getProvingCost,
   getProvingTimeStats,
   getTotalTTPStats,
@@ -94,16 +94,18 @@ export default async function BlockDetailsPage({
   const blockValueType = getBlockValueType(blockNumber)
   if (!blockValueType) throw new Error()
 
-  const blockRaw = await db.query.blocks.findFirst({
+  const block = await db.query.blocks.findFirst({
     with: {
       proofs: {
         with: {
           team: true,
-          cluster: {
+          cluster_version: {
             with: {
-              cc: {
+              cluster: true,
+              cluster_machines: {
                 with: {
-                  aip: true,
+                  machine: true,
+                  cloud_instance: true,
                 },
               },
             },
@@ -114,17 +116,11 @@ export default async function BlockDetailsPage({
     where: (blocks, { eq }) => eq(blocks[blockValueType], blockNumber),
   })
 
-  if (!blockRaw) notFound()
-
-  const block = {
-    ...blockRaw,
-    proofs: blockRaw.proofs.map((proof) => ({
-      ...proof,
-      cluster: tmp_renameClusterConfiguration(proof.cluster),
-    })),
-  }
+  if (!block) notFound()
 
   const { timestamp, block_number, gas_used, proofs, hash } = block
+
+  const proofsPerStatusCount = getProofsPerStatusCount(proofs)
 
   const costPerProofStats = getCostPerProofStats(proofs)
 
@@ -139,7 +135,7 @@ export default async function BlockDetailsPage({
       key: "status-of-proofs",
       label: "Status of proofs",
       description: <ProofStatusInfo />,
-      value: <ProofStatus proofs={proofs} />,
+      value: <ProofStatus statusCount={proofsPerStatusCount} />,
     },
     {
       key: "fastest-proving-time",
@@ -425,7 +421,7 @@ export default async function BlockDetailsPage({
 
         {proofs.sort(sortProofsStatusAndTimes).map((proof) => {
           const {
-            cluster,
+            cluster_version,
             proof_id,
             proving_time,
             proved_timestamp,
@@ -446,7 +442,8 @@ export default async function BlockDetailsPage({
 
           const provingCost = getProvingCost(proof)
 
-          const clusterConfigs = cluster?.cluster_configuration
+          const cluster = cluster_version?.cluster
+          const machines = cluster_version?.cluster_machines
 
           return (
             <div
@@ -612,7 +609,7 @@ export default async function BlockDetailsPage({
                       <PopoverTrigger className="flex items-center gap-2">
                         {formatUsd(provingCost)} <Cpu />
                       </PopoverTrigger>
-                      {cluster && clusterConfigs && (
+                      {cluster && machines && (
                         <PopoverContent>
                           <TooltipContentHeader>
                             {cluster.nickname}
@@ -637,45 +634,46 @@ export default async function BlockDetailsPage({
                           </TooltipContentHeader>
 
                           <div className="w-fit space-y-4">
-                            {clusterConfigs.map(
+                            {machines.map(
                               ({
-                                instance_count,
-                                instance_type_id,
-                                aws_instance_pricing,
+                                cloud_instance_count,
+                                cloud_instance_id,
+                                cloud_instance,
                               }) => {
                                 const {
-                                  instance_memory,
-                                  instance_storage,
-                                  instance_type,
+                                  memory,
+                                  disk_name,
+                                  disk_space,
+                                  instance_name,
                                   region,
-                                  vcpu,
+                                  cpu_cores,
                                   hourly_price,
-                                } = aws_instance_pricing || {}
+                                } = cloud_instance || {}
                                 const total_price = hourly_price
-                                  ? hourly_price * instance_count
+                                  ? hourly_price * cloud_instance_count
                                   : 0
                                 return (
                                   <div
                                     className="flex flex-col divide-y-2 overflow-hidden rounded bg-background"
-                                    key={instance_type_id}
+                                    key={cloud_instance_id}
                                   >
                                     <div className="flex gap-8">
                                       <div className="flex-1 space-y-2 p-2">
-                                        {instance_memory && (
-                                          <p>Memory: {instance_memory}</p>
+                                        {memory && <p>Memory: {memory} GB</p>}
+                                        {disk_name && (
+                                          <p>
+                                            Storage: {disk_name} {disk_space} GB
+                                          </p>
                                         )}
-                                        {instance_storage && (
-                                          <p>Storage: {instance_storage}</p>
-                                        )}
-                                        {instance_type && (
-                                          <p>Type: {instance_type}</p>
+                                        {instance_name && (
+                                          <p>Type: {instance_name}</p>
                                         )}
                                         {region && <p>Region: {region}</p>}
-                                        {vcpu && <p>vCPU: {vcpu}</p>}
+                                        {cpu_cores && <p>vCPU: {cpu_cores}</p>}
                                       </div>
-                                      {instance_count && (
+                                      {cloud_instance_count && (
                                         <div className="grid h-fit place-items-center rounded-bl bg-primary-dark px-4 py-2 text-xl font-bold text-background-highlight">
-                                          x{instance_count}
+                                          x{cloud_instance_count}
                                         </div>
                                       )}
                                     </div>

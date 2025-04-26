@@ -15,6 +15,48 @@
       "when": 1739530033776,
       "tag": "0001_drop-proof-binaries",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1741703181579,
+      "tag": "0002_api-key-manager",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1744036764546,
+      "tag": "0003_migrate-aws-instances-to-cloud-instances",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1744049706363,
+      "tag": "0004_storage-quotas",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1744724023680,
+      "tag": "0005_cluster-machines",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1744975634194,
+      "tag": "0006_vendor-zkvms",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1745410207150,
+      "tag": "0007_cloud-providers",
+      "breakpoints": true
     }
   ]
 }

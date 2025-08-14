@@ -307,9 +307,91 @@
           "maxLength": 64
         }
       ],
+      "uniqueConstraints": []
+    },
+    "benchmarks": {
+      "id": "public.benchmarks",
+      "schemaName": "public",
+      "tableName": "benchmarks",
+      "fields": [
+        {
+          "id": "public.benchmarks.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"benchmarks_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.benchmarks.operation_type",
+          "name": "operation_type",
+          "columnName": "operation_type",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.benchmarks.display_name",
+          "name": "display_name",
+          "columnName": "display_name",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.benchmarks.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "cluster_benchmarks",
+          "type": "cluster_benchmarks",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "cluster_benchmarksTobenchmarks",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
       "uniqueConstraints": [
         {
-          "name": "audit_log_entries_pkey",
+          "name": "benchmarks_pkey",
           "fields": [
             "id"
           ],
@@ -649,13 +731,6 @@
       ],
       "uniqueConstraints": [
         {
-          "name": "buckets_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        },
-        {
           "name": "bname",
           "fields": [
             "name"
@@ -776,20 +851,6 @@
           "name": "created_at",
           "columnName": "created_at",
           "type": "timestamptz",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": true,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "public.cloud_instances.provider",
-          "name": "provider",
-          "columnName": "provider",
-          "type": "provider",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,
@@ -940,6 +1001,38 @@
           "maxLength": null
         },
         {
+          "id": "public.cloud_instances.provider_id",
+          "name": "provider_id",
+          "columnName": "provider_id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "cloud_providers",
+          "type": "cloud_providers",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "cloud_instancesTocloud_providers",
+          "relationFromFields": [
+            "provider_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
           "name": "cluster_machines",
           "type": "cluster_machines",
           "isRequired": false,
@@ -964,6 +1057,243 @@
         },
         {
           "name": "cloud_instances_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "cloud_providers": {
+      "id": "public.cloud_providers",
+      "schemaName": "public",
+      "tableName": "cloud_providers",
+      "fields": [
+        {
+          "id": "public.cloud_providers.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"cloud_providers_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.cloud_providers.name",
+          "name": "name",
+          "columnName": "name",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.cloud_providers.display_name",
+          "name": "display_name",
+          "columnName": "display_name",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.cloud_providers.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "cloud_instances",
+          "type": "cloud_instances",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "cloud_instancesTocloud_providers",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "cloud_providers_name_unique",
+          "fields": [
+            "name"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "cloud_providers_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "cluster_benchmarks": {
+      "id": "public.cluster_benchmarks",
+      "schemaName": "public",
+      "tableName": "cluster_benchmarks",
+      "fields": [
+        {
+          "id": "public.cluster_benchmarks.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"cluster_benchmarks_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.cluster_benchmarks.cluster_id",
+          "name": "cluster_id",
+          "columnName": "cluster_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.cluster_benchmarks.benchmark_id",
+          "name": "benchmark_id",
+          "columnName": "benchmark_id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.cluster_benchmarks.time_ms",
+          "name": "time_ms",
+          "columnName": "time_ms",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.cluster_benchmarks.cost_usd",
+          "name": "cost_usd",
+          "columnName": "cost_usd",
+          "type": "float4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.cluster_benchmarks.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "benchmarks",
+          "type": "benchmarks",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "cluster_benchmarksTobenchmarks",
+          "relationFromFields": [
+            "benchmark_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "clusters",
+          "type": "clusters",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "cluster_benchmarksToclusters",
+          "relationFromFields": [
+            "cluster_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "cluster_benchmarks_pkey",
           "fields": [
             "id"
           ],
@@ -1429,6 +1759,62 @@
           "maxLength": null
         },
         {
+          "id": "public.clusters.is_open_source",
+          "name": "is_open_source",
+          "columnName": "is_open_source",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.clusters.is_multi_machine",
+          "name": "is_multi_machine",
+          "columnName": "is_multi_machine",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.clusters.software_link",
+          "name": "software_link",
+          "columnName": "software_link",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.clusters.is_active",
+          "name": "is_active",
+          "columnName": "is_active",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "teams",
           "type": "teams",
           "isRequired": true,
@@ -1441,6 +1827,20 @@
             "id"
           ],
           "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "cluster_benchmarks",
+          "type": "cluster_benchmarks",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "cluster_benchmarksToclusters",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
           "isId": false,
           "isGenerated": false,
           "sequence": false,
@@ -1778,15 +2178,7 @@
           "hasDefaultValue": false
         }
       ],
-      "uniqueConstraints": [
-        {
-          "name": "flow_state_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
+      "uniqueConstraints": []
     },
     "hooks": {
       "id": "supabase_functions.hooks",
@@ -2126,13 +2518,6 @@
       ],
       "uniqueConstraints": [
         {
-          "name": "identities_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        },
-        {
           "name": "identities_provider_id_provider_unique",
           "fields": [
             "provider",
@@ -2218,293 +2603,7 @@
           "maxLength": null
         }
       ],
-      "uniqueConstraints": [
-        {
-          "name": "instances_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
-    },
-    "key": {
-      "id": "pgsodium.key",
-      "schemaName": "pgsodium",
-      "tableName": "key",
-      "fields": [
-        {
-          "id": "pgsodium.key.id",
-          "name": "id",
-          "columnName": "id",
-          "type": "uuid",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": true,
-          "isId": true,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.status",
-          "name": "status",
-          "columnName": "status",
-          "type": "key_status",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": true,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.created",
-          "name": "created",
-          "columnName": "created",
-          "type": "timestamptz",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": true,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.expires",
-          "name": "expires",
-          "columnName": "expires",
-          "type": "timestamptz",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.key_type",
-          "name": "key_type",
-          "columnName": "key_type",
-          "type": "key_type",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.key_id",
-          "name": "key_id",
-          "columnName": "key_id",
-          "type": "int8",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": {
-            "identifier": "\"pgsodium\".\"key_key_id_seq\"",
-            "increment": 1,
-            "start": 1
-          },
-          "hasDefaultValue": true,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.key_context",
-          "name": "key_context",
-          "columnName": "key_context",
-          "type": "bytea",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": true,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.name",
-          "name": "name",
-          "columnName": "name",
-          "type": "text",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.associated_data",
-          "name": "associated_data",
-          "columnName": "associated_data",
-          "type": "text",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": true,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.raw_key",
-          "name": "raw_key",
-          "columnName": "raw_key",
-          "type": "bytea",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.raw_key_nonce",
-          "name": "raw_key_nonce",
-          "columnName": "raw_key_nonce",
-          "type": "bytea",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.parent_key",
-          "name": "parent_key",
-          "columnName": "parent_key",
-          "type": "uuid",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.comment",
-          "name": "comment",
-          "columnName": "comment",
-          "type": "text",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "pgsodium.key.user_data",
-          "name": "user_data",
-          "columnName": "user_data",
-          "type": "text",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "name": "key",
-          "type": "key",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "keyTokey",
-          "relationFromFields": [
-            "parent_key"
-          ],
-          "relationToFields": [
-            "id"
-          ],
-          "isList": false,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "key",
-          "type": "key",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "keyTokey",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "secrets",
-          "type": "secrets",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "secretsTokey",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        }
-      ],
-      "uniqueConstraints": [
-        {
-          "name": "key_key_id_key_context_key_type_idx",
-          "fields": [
-            "key_context",
-            "key_id",
-            "key_type"
-          ],
-          "nullNotDistinct": false
-        },
-        {
-          "name": "key_status_idx1",
-          "fields": [
-            "status"
-          ],
-          "nullNotDistinct": false
-        },
-        {
-          "name": "pgsodium_key_unique_name",
-          "fields": [
-            "name"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
+      "uniqueConstraints": []
     },
     "machines": {
       "id": "public.machines",
@@ -2728,24 +2827,6 @@
       "tableName": "messages",
       "fields": [
         {
-          "id": "realtime.messages.id",
-          "name": "id",
-          "columnName": "id",
-          "type": "int8",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": {
-            "identifier": "\"realtime\".\"messages_id_seq\"",
-            "increment": 1,
-            "start": 1
-          },
-          "hasDefaultValue": true,
-          "isId": true,
-          "maxLength": null
-        },
-        {
           "id": "realtime.messages.topic",
           "name": "topic",
           "columnName": "topic",
@@ -2774,16 +2855,44 @@
           "maxLength": null
         },
         {
-          "id": "realtime.messages.inserted_at",
-          "name": "inserted_at",
-          "columnName": "inserted_at",
-          "type": "timestamp",
-          "isRequired": true,
+          "id": "realtime.messages.payload",
+          "name": "payload",
+          "columnName": "payload",
+          "type": "jsonb",
+          "isRequired": false,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "realtime.messages.event",
+          "name": "event",
+          "columnName": "event",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "realtime.messages.private",
+          "name": "private",
+          "columnName": "private",
+          "type": "bool",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },
@@ -2797,8 +2906,36 @@
           "isList": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": false,
+          "hasDefaultValue": true,
           "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "realtime.messages.inserted_at",
+          "name": "inserted_at",
+          "columnName": "inserted_at",
+          "type": "timestamp",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "realtime.messages.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": true,
           "maxLength": null
         }
       ],
@@ -2806,7 +2943,8 @@
         {
           "name": "messages_pkey",
           "fields": [
-            "id"
+            "id",
+            "inserted_at"
           ],
           "nullNotDistinct": false
         }
@@ -2907,13 +3045,6 @@
         }
       ],
       "uniqueConstraints": [
-        {
-          "name": "amr_id_pk",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        },
         {
           "name": "mfa_amr_claims_session_id_authentication_method_pkey",
           "fields": [
@@ -3046,15 +3177,7 @@
           "hasDefaultValue": false
         }
       ],
-      "uniqueConstraints": [
-        {
-          "name": "mfa_challenges_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
+      "uniqueConstraints": []
     },
     "mfa_factors": {
       "id": "auth.mfa_factors",
@@ -3271,13 +3394,6 @@
           "nullNotDistinct": false
         },
         {
-          "name": "mfa_factors_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        },
-        {
           "name": "mfa_factors_user_friendly_name_unique",
           "fields": [
             "friendly_name",
@@ -3362,13 +3478,6 @@
           "name": "migrations_name_key",
           "fields": [
             "name"
-          ],
-          "nullNotDistinct": false
-        },
-        {
-          "name": "migrations_pkey",
-          "fields": [
-            "id"
           ],
           "nullNotDistinct": false
         }
@@ -3626,13 +3735,6 @@
       ],
       "uniqueConstraints": [
         {
-          "name": "objects_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        },
-        {
           "name": "bucketid_objname",
           "fields": [
             "bucket_id",
@@ -3784,13 +3886,6 @@
       ],
       "uniqueConstraints": [
         {
-          "name": "one_time_tokens_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        },
-        {
           "name": "one_time_tokens_user_id_token_type_key",
           "fields": [
             "token_type",
@@ -3894,17 +3989,7 @@
           "hasDefaultValue": false
         }
       ],
-      "uniqueConstraints": [
-        {
-          "name": "prefixes_pkey",
-          "fields": [
-            "bucket_id",
-            "level",
-            "name"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
+      "uniqueConstraints": []
     },
     "programs": {
       "id": "public.programs",
@@ -4271,6 +4356,289 @@
         }
       ]
     },
+    "proofs_daily_stats": {
+      "id": "public.proofs_daily_stats",
+      "schemaName": "public",
+      "tableName": "proofs_daily_stats",
+      "fields": [
+        {
+          "id": "public.proofs_daily_stats.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"proofs_daily_stats_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.proofs_daily_stats.date",
+          "name": "date",
+          "columnName": "date",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.proofs_daily_stats.avg_cost",
+          "name": "avg_cost",
+          "columnName": "avg_cost",
+          "type": "float8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.proofs_daily_stats.median_cost",
+          "name": "median_cost",
+          "columnName": "median_cost",
+          "type": "float8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.proofs_daily_stats.avg_latency",
+          "name": "avg_latency",
+          "columnName": "avg_latency",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.proofs_daily_stats.median_latency",
+          "name": "median_latency",
+          "columnName": "median_latency",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.proofs_daily_stats.total_proofs",
+          "name": "total_proofs",
+          "columnName": "total_proofs",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "proofs_daily_stats_date_key",
+          "fields": [
+            "date"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "proofs_daily_stats_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "prover_daily_stats": {
+      "id": "public.prover_daily_stats",
+      "schemaName": "public",
+      "tableName": "prover_daily_stats",
+      "fields": [
+        {
+          "id": "public.prover_daily_stats.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"prover_daily_stats_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.prover_daily_stats.date",
+          "name": "date",
+          "columnName": "date",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.prover_daily_stats.team_id",
+          "name": "team_id",
+          "columnName": "team_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.prover_daily_stats.avg_cost",
+          "name": "avg_cost",
+          "columnName": "avg_cost",
+          "type": "float8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.prover_daily_stats.median_cost",
+          "name": "median_cost",
+          "columnName": "median_cost",
+          "type": "float8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.prover_daily_stats.avg_latency",
+          "name": "avg_latency",
+          "columnName": "avg_latency",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.prover_daily_stats.median_latency",
+          "name": "median_latency",
+          "columnName": "median_latency",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.prover_daily_stats.total_proofs",
+          "name": "total_proofs",
+          "columnName": "total_proofs",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "teams",
+          "type": "teams",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "prover_daily_statsToteams",
+          "relationFromFields": [
+            "team_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "prover_daily_stats_date_team_key",
+          "fields": [
+            "date",
+            "team_id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "prover_daily_stats_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
     "recursive_root_proofs": {
       "id": "public.recursive_root_proofs",
       "schemaName": "public",
@@ -4567,13 +4935,6 @@
       ],
       "uniqueConstraints": [
         {
-          "name": "refresh_tokens_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        },
-        {
           "name": "refresh_tokens_token_unique",
           "fields": [
             "token"
@@ -4746,15 +5107,7 @@
           "hasDefaultValue": false
         }
       ],
-      "uniqueConstraints": [
-        {
-          "name": "s3_multipart_uploads_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
+      "uniqueConstraints": []
     },
     "s3_multipart_uploads_parts": {
       "id": "storage.s3_multipart_uploads_parts",
@@ -4938,15 +5291,7 @@
           "hasDefaultValue": false
         }
       ],
-      "uniqueConstraints": [
-        {
-          "name": "s3_multipart_uploads_parts_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
+      "uniqueConstraints": []
     },
     "saml_providers": {
       "id": "auth.saml_providers",
@@ -5103,13 +5448,6 @@
           "name": "saml_providers_entity_id_key",
           "fields": [
             "entity_id"
-          ],
-          "nullNotDistinct": false
-        },
-        {
-          "name": "saml_providers_pkey",
-          "fields": [
-            "id"
           ],
           "nullNotDistinct": false
         }
@@ -5269,15 +5607,7 @@
           "hasDefaultValue": false
         }
       ],
-      "uniqueConstraints": [
-        {
-          "name": "saml_relay_states_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
+      "uniqueConstraints": []
     },
     "_realtime_schema_migrations": {
       "id": "_realtime.schema_migrations",
@@ -5335,15 +5665,7 @@
           "maxLength": 255
         }
       ],
-      "uniqueConstraints": [
-        {
-          "name": "schema_migrations_pkey",
-          "fields": [
-            "version"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
+      "uniqueConstraints": []
     },
     "realtime_schema_migrations": {
       "id": "realtime.schema_migrations",
@@ -5510,7 +5832,7 @@
           "isList": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": true,
+          "hasDefaultValue": false,
           "isId": false,
           "maxLength": null
         },
@@ -5555,24 +5877,6 @@
           "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
-        },
-        {
-          "name": "key",
-          "type": "key",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "secretsTokey",
-          "relationFromFields": [
-            "key_id"
-          ],
-          "relationToFields": [
-            "id"
-          ],
-          "isList": false,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
         }
       ],
       "uniqueConstraints": [
@@ -5835,15 +6139,7 @@
           "hasDefaultValue": false
         }
       ],
-      "uniqueConstraints": [
-        {
-          "name": "sessions_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
+      "uniqueConstraints": []
     },
     "sso_domains": {
       "id": "auth.sso_domains",
@@ -5939,15 +6235,7 @@
           "hasDefaultValue": false
         }
       ],
-      "uniqueConstraints": [
-        {
-          "name": "sso_domains_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
+      "uniqueConstraints": []
     },
     "sso_providers": {
       "id": "auth.sso_providers",
@@ -6053,15 +6341,7 @@
           "hasDefaultValue": false
         }
       ],
-      "uniqueConstraints": [
-        {
-          "name": "sso_providers_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        }
-      ]
+      "uniqueConstraints": []
     },
     "subscription": {
       "id": "realtime.subscription",
@@ -6301,6 +6581,20 @@
           "maxLength": null
         },
         {
+          "id": "public.teams.slug",
+          "name": "slug",
+          "columnName": "slug",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "users",
           "type": "users",
           "isRequired": true,
@@ -6361,11 +6655,39 @@
           "hasDefaultValue": false
         },
         {
+          "name": "prover_daily_stats",
+          "type": "prover_daily_stats",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "prover_daily_statsToteams",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
           "name": "recursive_root_proofs",
           "type": "recursive_root_proofs",
           "isRequired": false,
           "kind": "object",
           "relationName": "recursive_root_proofsToteams",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "zkvms",
+          "type": "zkvms",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "zkvmsToteams",
           "relationFromFields": [],
           "relationToFields": [],
           "isList": true,
@@ -6380,6 +6702,13 @@
           "name": "teams_pkey",
           "fields": [
             "id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "teams_slug_unique",
+          "fields": [
+            "slug"
           ],
           "nullNotDistinct": false
         }
@@ -6599,6 +6928,48 @@
           "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
+        },
+        {
+          "id": "_realtime.tenants.private_only",
+          "name": "private_only",
+          "columnName": "private_only",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "_realtime.tenants.migrations_ran",
+          "name": "migrations_ran",
+          "columnName": "migrations_ran",
+          "type": "int4",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "_realtime.tenants.broadcast_adapter",
+          "name": "broadcast_adapter",
+          "columnName": "broadcast_adapter",
+          "type": "varchar",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": 255
         },
         {
           "name": "extensions",
@@ -7189,37 +7560,9 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false
-        },
-        {
-          "name": "vendors",
-          "type": "vendors",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "vendorsTousers",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
         }
       ],
       "uniqueConstraints": [
-        {
-          "name": "users_phone_key",
-          "fields": [
-            "phone"
-          ],
-          "nullNotDistinct": false
-        },
-        {
-          "name": "users_pkey",
-          "fields": [
-            "id"
-          ],
-          "nullNotDistinct": false
-        },
         {
           "name": "confirmation_token_idx",
           "fields": [
@@ -7261,33 +7604,44 @@
             "email"
           ],
           "nullNotDistinct": false
+        },
+        {
+          "name": "users_phone_key",
+          "fields": [
+            "phone"
+          ],
+          "nullNotDistinct": false
         }
       ]
     },
-    "vendors": {
-      "id": "public.vendors",
+    "zkvm_performance_metrics": {
+      "id": "public.zkvm_performance_metrics",
       "schemaName": "public",
-      "tableName": "vendors",
+      "tableName": "zkvm_performance_metrics",
       "fields": [
         {
-          "id": "public.vendors.id",
+          "id": "public.zkvm_performance_metrics.id",
           "name": "id",
           "columnName": "id",
-          "type": "uuid",
+          "type": "int8",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": true,
+          "sequence": {
+            "identifier": "\"public\".\"zkvm_performance_metrics_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": false,
           "isId": true,
           "maxLength": null
         },
         {
-          "id": "public.vendors.user_id",
-          "name": "user_id",
-          "columnName": "user_id",
-          "type": "uuid",
+          "id": "public.zkvm_performance_metrics.zkvm_id",
+          "name": "zkvm_id",
+          "columnName": "zkvm_id",
+          "type": "int8",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,
@@ -7298,10 +7652,10 @@
           "maxLength": null
         },
         {
-          "id": "public.vendors.name",
-          "name": "name",
-          "columnName": "name",
-          "type": "text",
+          "id": "public.zkvm_performance_metrics.size_bytes",
+          "name": "size_bytes",
+          "columnName": "size_bytes",
+          "type": "int8",
           "isRequired": true,
           "kind": "scalar",
           "isList": false,
@@ -7312,11 +7666,11 @@
           "maxLength": null
         },
         {
-          "id": "public.vendors.github_org",
-          "name": "github_org",
-          "columnName": "github_org",
-          "type": "text",
-          "isRequired": false,
+          "id": "public.zkvm_performance_metrics.verification_ms",
+          "name": "verification_ms",
+          "columnName": "verification_ms",
+          "type": "int4",
+          "isRequired": true,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,
@@ -7326,49 +7680,7 @@
           "maxLength": null
         },
         {
-          "id": "public.vendors.logo_url",
-          "name": "logo_url",
-          "columnName": "logo_url",
-          "type": "text",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "public.vendors.twitter_handle",
-          "name": "twitter_handle",
-          "columnName": "twitter_handle",
-          "type": "text",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "public.vendors.website_url",
-          "name": "website_url",
-          "columnName": "website_url",
-          "type": "text",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "public.vendors.created_at",
+          "id": "public.zkvm_performance_metrics.created_at",
           "name": "created_at",
           "columnName": "created_at",
           "type": "timestamptz",
@@ -7382,13 +7694,27 @@
           "maxLength": null
         },
         {
-          "name": "users",
-          "type": "users",
+          "id": "public.zkvm_performance_metrics.updated_at",
+          "name": "updated_at",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "zkvms",
+          "type": "zkvms",
           "isRequired": true,
           "kind": "object",
-          "relationName": "vendorsTousers",
+          "relationName": "zkvm_performance_metricsTozkvms",
           "relationFromFields": [
-            "user_id"
+            "zkvm_id"
           ],
           "relationToFields": [
             "id"
@@ -7398,16 +7724,201 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "zkvm_performance_metrics_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "zkvm_performance_metrics_zkvm_id_unique",
+          "fields": [
+            "zkvm_id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "zkvm_security_metrics": {
+      "id": "public.zkvm_security_metrics",
+      "schemaName": "public",
+      "tableName": "zkvm_security_metrics",
+      "fields": [
+        {
+          "id": "public.zkvm_security_metrics.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"zkvm_security_metrics_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvm_security_metrics.zkvm_id",
+          "name": "zkvm_id",
+          "columnName": "zkvm_id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvm_security_metrics.protocol_soundness",
+          "name": "protocol_soundness",
+          "columnName": "protocol_soundness",
+          "type": "severity_level",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvm_security_metrics.implementation_soundness",
+          "name": "implementation_soundness",
+          "columnName": "implementation_soundness",
+          "type": "severity_level",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvm_security_metrics.evm_stf_bytecode",
+          "name": "evm_stf_bytecode",
+          "columnName": "evm_stf_bytecode",
+          "type": "severity_level",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvm_security_metrics.quantum_security",
+          "name": "quantum_security",
+          "columnName": "quantum_security",
+          "type": "severity_level",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvm_security_metrics.security_target_bits",
+          "name": "security_target_bits",
+          "columnName": "security_target_bits",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvm_security_metrics.max_bounty_amount",
+          "name": "max_bounty_amount",
+          "columnName": "max_bounty_amount",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvm_security_metrics.trusted_setup",
+          "name": "trusted_setup",
+          "columnName": "trusted_setup",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvm_security_metrics.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvm_security_metrics.updated_at",
+          "name": "updated_at",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
         },
         {
           "name": "zkvms",
           "type": "zkvms",
-          "isRequired": false,
+          "isRequired": true,
           "kind": "object",
-          "relationName": "zkvmsTovendors",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
+          "relationName": "zkvm_security_metricsTozkvms",
+          "relationFromFields": [
+            "zkvm_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
           "isId": false,
           "isGenerated": false,
           "sequence": false,
@@ -7416,9 +7927,16 @@
       ],
       "uniqueConstraints": [
         {
-          "name": "vendors_pkey",
+          "name": "zkvm_security_metrics_pkey",
           "fields": [
             "id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "zkvm_security_metrics_zkvm_id_unique",
+          "fields": [
+            "zkvm_id"
           ],
           "nullNotDistinct": false
         }
@@ -7570,20 +8088,6 @@
           "maxLength": null
         },
         {
-          "id": "public.zkvms.vendor_id",
-          "name": "vendor_id",
-          "columnName": "vendor_id",
-          "type": "uuid",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "id": "public.zkvms.name",
           "name": "name",
           "columnName": "name",
@@ -7696,18 +8200,116 @@
           "maxLength": null
         },
         {
-          "name": "vendors",
-          "type": "vendors",
+          "id": "public.zkvms.slug",
+          "name": "slug",
+          "columnName": "slug",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvms.dual_licenses",
+          "name": "dual_licenses",
+          "columnName": "dual_licenses",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvms.is_open_source",
+          "name": "is_open_source",
+          "columnName": "is_open_source",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvms.is_proving_mainnet",
+          "name": "is_proving_mainnet",
+          "columnName": "is_proving_mainnet",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.zkvms.team_id",
+          "name": "team_id",
+          "columnName": "team_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "teams",
+          "type": "teams",
           "isRequired": true,
           "kind": "object",
-          "relationName": "zkvmsTovendors",
+          "relationName": "zkvmsToteams",
           "relationFromFields": [
-            "vendor_id"
+            "team_id"
           ],
           "relationToFields": [
             "id"
           ],
           "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "zkvm_performance_metrics",
+          "type": "zkvm_performance_metrics",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "zkvm_performance_metricsTozkvms",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "zkvm_security_metrics",
+          "type": "zkvm_security_metrics",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "zkvm_security_metricsTozkvms",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
           "isId": false,
           "isGenerated": false,
           "sequence": false,
@@ -7733,6 +8335,13 @@
           "name": "zkvms_pkey",
           "fields": [
             "id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "zkvms_slug_unique",
+          "fields": [
+            "slug"
           ],
           "nullNotDistinct": false
         }
@@ -7827,61 +8436,6 @@
         }
       ]
     },
-    "key_status": {
-      "schemaName": "pgsodium",
-      "values": [
-        {
-          "name": "default"
-        },
-        {
-          "name": "expired"
-        },
-        {
-          "name": "invalid"
-        },
-        {
-          "name": "valid"
-        }
-      ]
-    },
-    "key_type": {
-      "schemaName": "pgsodium",
-      "values": [
-        {
-          "name": "aead-det"
-        },
-        {
-          "name": "aead-ietf"
-        },
-        {
-          "name": "auth"
-        },
-        {
-          "name": "generichash"
-        },
-        {
-          "name": "hmacsha256"
-        },
-        {
-          "name": "hmacsha512"
-        },
-        {
-          "name": "kdf"
-        },
-        {
-          "name": "secretbox"
-        },
-        {
-          "name": "secretstream"
-        },
-        {
-          "name": "shorthash"
-        },
-        {
-          "name": "stream_xchacha20"
-        }
-      ]
-    },
     "key_mode": {
       "schemaName": "public",
       "values": [
@@ -7899,14 +8453,17 @@
         }
       ]
     },
-    "provider": {
+    "severity_level": {
       "schemaName": "public",
       "values": [
         {
-          "name": "aws"
+          "name": "green"
         },
         {
-          "name": "vastai"
+          "name": "red"
+        },
+        {
+          "name": "yellow"
         }
       ]
     },

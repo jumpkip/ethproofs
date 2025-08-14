@@ -18,7 +18,7 @@ export default async function ZkvmsPage() {
   )
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex w-full flex-col gap-8">
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-bold">ZKVMs</h1>
         <div className="flex flex-col gap-2">
@@ -35,12 +35,14 @@ export default async function ZkvmsPage() {
             The <span className="text-primary-light">ID column</span> in this
             table serves as a unique identifier for each zkVM version and must
             be used when creating or modifying clusters through the{" "}
-            <Link href="/api">API</Link> endpoints.
+            <Link href="/api.html">API</Link> endpoints.
           </p>
         </div>
       </div>
 
-      <ZkvmsTable zkvms={zkvms} />
+      <div className="overflow-x-auto">
+        <ZkvmsTable zkvms={zkvms} />
+      </div>
 
       <p className="text-muted-foreground text-sm">
         If you&apos;re looking for a zkVM version that&apos;s not listed here,

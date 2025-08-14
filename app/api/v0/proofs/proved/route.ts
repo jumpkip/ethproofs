@@ -1,9 +1,11 @@
-import { eq, sql } from "drizzle-orm"
-import { revalidatePath } from "next/cache"
+import { eq } from "drizzle-orm"
+import { revalidateTag } from "next/cache"
 import { ZodError } from "zod"
 
+import { TAGS } from "@/lib/constants"
+
 import { db } from "@/db"
-import { blocks, programs, proofs } from "@/db/schema"
+import { blocks, clusters, programs, proofs } from "@/db/schema"
 import { uploadProofBinary } from "@/lib/api/proof_binaries"
 import { isStorageQuotaExceeded } from "@/lib/api/storage"
 import { getTeam } from "@/lib/api/teams"
@@ -63,13 +65,16 @@ export const POST = withAuth(async ({ request, user, timestamp }) => {
     try {
       // create block
       console.log("creating block", block_number)
-      await db.insert(blocks).values({
-        block_number,
-        gas_used: Number(blockData.gasUsed),
-        transaction_count: blockData.txsCount,
-        timestamp: new Date(Number(blockData.timestamp) * 1000).toISOString(),
-        hash: blockData.hash,
-      })
+      await db
+        .insert(blocks)
+        .values({
+          block_number,
+          gas_used: Number(blockData.gasUsed),
+          transaction_count: blockData.txsCount,
+          timestamp: new Date(Number(blockData.timestamp) * 1000).toISOString(),
+          hash: blockData.hash,
+        })
+        .onConflictDoNothing()
     } catch (error) {
       console.error("error creating block", error)
       return new Response("Internal server error", { status: 500 })
@@ -94,6 +99,9 @@ export const POST = withAuth(async ({ request, user, timestamp }) => {
   const clusterVersion = await db.query.clusterVersions.findFirst({
     columns: {
       id: true,
+    },
+    with: {
+      cluster: true,
     },
     where: (clusterVersions, { eq }) =>
       eq(clusterVersions.cluster_id, cluster.id),
@@ -176,6 +184,20 @@ export const POST = withAuth(async ({ request, user, timestamp }) => {
         })
         .returning({ proof_id: proofs.proof_id })
 
+      // handle active cluster status and updates
+      if (!clusterVersion.cluster.is_active) {
+        await tx
+          .update(clusters)
+          .set({
+            is_active: true,
+          })
+          .where(eq(clusters.id, cluster.id))
+
+        // invalidate active clusters stats
+        revalidateTag(TAGS.CLUSTERS)
+        revalidateTag(TAGS.CLUSTER_SUMMARY)
+      }
+
       if (!storageQuotaExceeded) {
         const team = await getTeam(user.id)
         const teamName = team?.name ? team.name : cluster.id.split("-")[0]
@@ -186,8 +208,11 @@ export const POST = withAuth(async ({ request, user, timestamp }) => {
       return newProof
     })
 
-    // invalidate home page cache
-    revalidatePath("/")
+    // invalidate cache
+    revalidateTag(TAGS.PROOFS)
+    revalidateTag(TAGS.BLOCKS)
+    revalidateTag(`cluster-${cluster.id}`)
+    revalidateTag(`block-${block_number}`)
 
     // return the generated proof_id
     return Response.json(newProof)

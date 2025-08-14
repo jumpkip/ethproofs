@@ -57,6 +57,118 @@
       "when": 1745410207150,
       "tag": "0007_cloud-providers",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1745752695001,
+      "tag": "0008_proof-stats",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1745756169542,
+      "tag": "0009_add-median-recent-summary",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1745938460958,
+      "tag": "0010_cluster-is-open-source",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1745941611632,
+      "tag": "0011_cluster-summary",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1745950118998,
+      "tag": "0012_cluster-multi-machine",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1746104720272,
+      "tag": "0013_zkvm-team-vendor-slug",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1746183416328,
+      "tag": "0014_zkvm-metrics",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1746192359710,
+      "tag": "0015_team-clusters-stats",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1746449818345,
+      "tag": "0016_cluster-software-link",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1746622500704,
+      "tag": "0017_cluster-benchmarks",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1747146840536,
+      "tag": "0018_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1748002692380,
+      "tag": "0019_team-slug",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1748426789848,
+      "tag": "0020_cluster-is-active-flag",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1751551599876,
+      "tag": "0021_add-tracker-columns-to-vkvms",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1753036886957,
+      "tag": "0022_add-team-to-zkvms",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1753128679795,
+      "tag": "0023_remove-vendors",
+      "breakpoints": true
     }
   ]
 }

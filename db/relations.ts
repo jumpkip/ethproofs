@@ -3,9 +3,11 @@ import { authUsers } from "drizzle-orm/supabase"
 
 import {
   apiAuthTokens,
+  benchmarks,
   blocks,
   cloudInstances,
   cloudProviders,
+  clusterBenchmarks,
   clusterMachines,
   clusters,
   clusterVersions,
@@ -14,8 +16,9 @@ import {
   proofs,
   recursiveRootProofs,
   teams,
-  vendors,
+  zkvmPerformanceMetrics,
   zkvms,
+  zkvmSecurityMetrics,
   zkvmVersions,
 } from "./schema"
 
@@ -40,6 +43,7 @@ export const clustersRelations = relations(clusters, ({ one, many }) => ({
     fields: [clusters.team_id],
     references: [teams.id],
   }),
+  benchmarks: many(clusterBenchmarks),
 }))
 
 export const clusterVersionsRelations = relations(
@@ -91,6 +95,20 @@ export const cloudInstancesRelations = relations(
   })
 )
 
+export const clusterBenchmarksRelations = relations(
+  clusterBenchmarks,
+  ({ one }) => ({
+    cluster: one(clusters, {
+      fields: [clusterBenchmarks.cluster_id],
+      references: [clusters.id],
+    }),
+    benchmark: one(benchmarks, {
+      fields: [clusterBenchmarks.benchmark_id],
+      references: [benchmarks.id],
+    }),
+  })
+)
+
 export const recursiveRootProofsRelations = relations(
   recursiveRootProofs,
   ({ one }) => ({
@@ -117,19 +135,20 @@ export const teamsRelations = relations(teams, ({ one }) => ({
   }),
 }))
 
-export const vendorsRelations = relations(vendors, ({ one }) => ({
-  user: one(authUsers, {
-    fields: [vendors.user_id],
-    references: [authUsers.id],
-  }),
-}))
-
 export const zkvmsRelations = relations(zkvms, ({ one, many }) => ({
-  vendor: one(vendors, {
-    fields: [zkvms.vendor_id],
-    references: [vendors.id],
+  team: one(teams, {
+    fields: [zkvms.team_id],
+    references: [teams.id],
   }),
   versions: many(zkvmVersions),
+  security_metrics: one(zkvmSecurityMetrics, {
+    fields: [zkvms.id],
+    references: [zkvmSecurityMetrics.zkvm_id],
+  }),
+  performance_metrics: one(zkvmPerformanceMetrics, {
+    fields: [zkvms.id],
+    references: [zkvmPerformanceMetrics.zkvm_id],
+  }),
 }))
 
 export const zkvmVersionsRelations = relations(zkvmVersions, ({ one }) => ({

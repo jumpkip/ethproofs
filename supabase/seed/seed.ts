@@ -1,7 +1,10 @@
+import { setSeconds } from "date-fns"
 import { copycat, faker } from "@snaplet/copycat"
 import { createSeedClient } from "@snaplet/seed"
 
-const vendorsProfiles = [
+// TODO: Needs updating
+
+const zkvmProviderProfiles = [
   {
     name: "Succinct",
     logo_url:
@@ -98,16 +101,16 @@ const zkvmsData = [
 const main = async () => {
   const seed = await createSeedClient({ dryRun: true })
 
-  // create users for each vendors & provers profile
+  // create users for each team
   const { users } = await seed.users((x) =>
-    x([...vendorsProfiles, ...proversProfiles].length, ({ index }) => {
+    x([...zkvmProviderProfiles, ...proversProfiles].length, ({ index }) => {
       const profile =
-        index < vendorsProfiles.length
-          ? vendorsProfiles[index]
-          : proversProfiles[index - vendorsProfiles.length]
+        index < zkvmProviderProfiles.length
+          ? zkvmProviderProfiles[index]
+          : proversProfiles[index - zkvmProviderProfiles.length]
       return {
         email: `${profile.name.toLowerCase()}@${
-          index < vendorsProfiles.length ? "vendor" : "prover"
+          index < zkvmProviderProfiles.length ? "vendor" : "prover"
         }.com`,
         name: profile.name,
         aud: "authenticated",
@@ -119,21 +122,6 @@ const main = async () => {
         encrypted_password: "password",
       }
     })
-  )
-
-  // add vendors
-  const { vendors } = await seed.vendors(
-    (x) =>
-      x(vendorsProfiles.length, ({ index }) => ({
-        name: vendorsProfiles[index].name,
-        logo_url: vendorsProfiles[index].logo_url,
-        website_url: vendorsProfiles[index].website_url,
-        twitter_handle: vendorsProfiles[index].twitter_handle,
-        github_org: vendorsProfiles[index].github_org,
-      })),
-    {
-      connect: { users: users },
-    }
   )
 
   // add zkvms
@@ -149,9 +137,17 @@ const main = async () => {
         precompiles: zkvmsData[index].precompiles,
       })),
     {
-      connect: { vendors },
+      // connect: { teams },
     }
   )
+
+  // zkvm metrics
+  await seed.zkvm_performance_metrics((x) => x(zkvmsData.length), {
+    connect: { zkvms },
+  })
+  await seed.zkvm_security_metrics((x) => x(zkvmsData.length), {
+    connect: { zkvms },
+  })
 
   // add zkvm_versions, set 2 versions for each zkvm
   const { zkvm_versions } = await seed.zkvm_versions(
@@ -214,6 +210,9 @@ const main = async () => {
             hardware: faker.lorem.sentence(),
             cycle_type: faker.lorem.word().slice(0, 2).toUpperCase() + index,
             proof_type: copycat.oneOfString(seed, ["STARK", "SNARK"]),
+            is_multi_machine: copycat.bool(seed),
+            is_open_source: copycat.bool(seed),
+            software_link: copycat.oneOf(seed, [faker.internet.url(), null]),
           }
         }),
       {
@@ -250,21 +249,56 @@ const main = async () => {
       { connect: { machines, cluster_versions, cloud_instances } }
     )
 
-    const { proofs } = await seed.proofs(
+    await seed.proofs(
       (x) =>
-        x(200, () => ({
-          proof_id: ({ seed }) => copycat.int(seed, { min: 1, max: 1000000 }),
-          proving_time: ({ seed }) =>
-            copycat.int(seed, { min: 1000, max: 10000 }),
-          proof_status: ({ seed }) =>
-            copycat.oneOfString(seed, ["proved", "proving", "queued"]),
-          proving_cycles: ({ seed }) =>
-            copycat.int(seed, { min: 100000, max: 1000000 }),
-          size_bytes: ({ seed }) =>
-            copycat.int(seed, { min: 2 ** 15, max: 2 ** 23 }),
-          team_id: user.id,
-        })),
-      { connect: { blocks, cluster_versions } }
+        x(blocks.length, ({ seed }) => {
+          const status = copycat.oneOfString(seed, [
+            "proved",
+            "proving",
+            "queued",
+          ])
+
+          const queued_timestamp = faker.date.recent({
+            days: 10,
+            refDate: new Date(),
+          })
+
+          let proving_timestamp: Date | null = null
+          if (status === "proving") {
+            proving_timestamp = setSeconds(
+              queued_timestamp,
+              copycat.int(seed, { min: 1, max: 10 })
+            )
+          }
+
+          let proved_timestamp: Date | null = null
+          if (status === "proved") {
+            proving_timestamp = setSeconds(
+              queued_timestamp,
+              copycat.int(seed, { min: 1, max: 10 })
+            )
+            proved_timestamp = setSeconds(
+              proving_timestamp!,
+              copycat.int(seed + 1, { min: 1, max: 10 })
+            )
+          }
+
+          return {
+            proof_id: ({ seed }) => copycat.int(seed, { min: 1, max: 1000000 }),
+            proving_time: ({ seed }) =>
+              copycat.int(seed, { min: 1000, max: 10000 }),
+            proof_status: status,
+            proving_cycles: ({ seed }) =>
+              copycat.int(seed, { min: 100000, max: 1000000 }),
+            size_bytes: ({ seed }) =>
+              copycat.int(seed, { min: 2 ** 15, max: 2 ** 23 }),
+            team_id: user.id,
+            proved_timestamp: () => proved_timestamp?.toISOString() ?? null,
+            proving_timestamp: () => proving_timestamp?.toISOString() ?? null,
+            queued_timestamp: () => queued_timestamp.toISOString(),
+          }
+        }),
+      { connect: { blocks, cluster_versions, teams: [{ id: user.id }] } }
     )
   }
 
